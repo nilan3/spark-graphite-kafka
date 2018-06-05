@@ -1,0 +1,17 @@
+from kafka import KafkaProducer
+
+class KafkaConnector(object):
+    """
+    Connector for writing to kafka
+    """
+
+    @staticmethod
+    def push_stats_to_kafka(options, data_frame):
+        """Send the stats to kafka output topic."""
+        producer = KafkaProducer(bootstrap_servers=options['bootstrap.servers'])
+
+        # send each json element to output kafka topic
+        for row in data_frame.toJSON().collect():
+            producer.send(options['topic.output'], bytes(row))
+
+        producer.close()
