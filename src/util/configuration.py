@@ -25,17 +25,14 @@ class Configuration(object):
                 return default
         return value
 
-    def kafka_input_options(self):
-        return self.property('kafka.input.options', self.property('kafka.options'))
+    def graphite_server(self):
+        return self.property('graphite.server')
 
-    def kafka_output_options(self):
-        return self.property('kafka.output.options', self.property('kafka.options'))
+    def graphite_port(self):
+        return self.property('graphite.port')
 
     def kafka_bootstrap_servers(self):
-        return self.property('kafka.output.options', self.property('kafka.options'))['bootstrap.servers']
-
-    def kafka_input_topics(self):
-        return self.property('kafka.input.topics', [self.property('kafka.input.topic')])
+        return self.property('kafka.output')['bootstrap.servers']
 
     def kafka_output_topics(self):
-        return self.property('kafka.output.topics', [self.property('kafka.output.topic')])
+        return self.property('kafka.output.topics')

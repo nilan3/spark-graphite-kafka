@@ -1,22 +1,35 @@
+from pyspark.sql import Row
+from collections import OrderedDict
+
 from common.abstract_pipeline import AbstractPipeline
 from common.connector.graphite_source import GraphiteSource
 from common.connector.kafka_sink import KafkaConnector
 
 
-class KafkaPipeline(AbstractPipeline):
+class MainPipeline(AbstractPipeline):
     """
     Base class for structured streaming pipeline, which read data from kafka and write result to kafka as well
     """
 
     def _create_custom_read_batch(self, spark):
-        read_stream = spark.readStream.format("kafka")
-        options = self._configuration.property("kafka")
-        result = self.__set_kafka_securing_settings(read_stream, options) \
-            .option("subscribe", ",".join(self._configuration.property("kafka.topics.inputs")))
-        self.__add_option_if_exists(result, options, "maxOffsetsPerTrigger")
-        self.__add_option_if_exists(result, options, "startingOffsets")
-        self.__add_option_if_exists(result, options, "failOnDataLoss")
-        return result.load()
+        target = self._configuration.property("graphite.target")
+        t_start = self._configuration.property("graphite.t_start")
+        server = self._configuration.property("graphite.server")
+        port = self._configuration.property("graphite.port")
+        resp = GraphiteSource.get_data('{}:{}'.format(server, port), t_start, target)
+        df_arr = []
+        for series in resp:
+            for point in series['datapoints']:
+                record = {
+                    "@timestamp": str(point[1]),
+                    "value": point[0],
+                    "target": series["target"]
+                }
+                df_arr.append(record)
+
+        dtaRDD = spark.sparkContext.parallelize(df_arr).map(lambda x: Row(**OrderedDict(sorted(x.items()))))
+
+        return dtaRDD.toDF()
 
     @staticmethod
     def __set_kafka_securing_settings(stream, options):

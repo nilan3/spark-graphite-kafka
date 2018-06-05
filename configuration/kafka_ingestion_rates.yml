@@ -1,0 +1,20 @@
+spark:
+  appName: kafka-ingestion-rates
+  master: local[*]
+  checkpointLocation: file:///spark/kafka/ingestion-rates/checkpoints
+  shuffle.partitions: 1
+  consoleWriter: true
+
+kafka:
+  bootstrap.servers: 172.28.232.236:9094,172.28.232.237:9094,172.28.232.238:9094,172.28.232.239:9094,172.28.232.240:9094,172.28.232.241:9094,172.28.232.242:9094,172.28.232.243:9094,172.28.232.244:9094
+  topics:
+    outputs:
+      ingestion: odhat_pr_various_pan_prd_kafka_ingestion_rates_v1
+  security.protocol: SASL_PLAINTEXT
+  sasl.mechanism: PLAIN
+
+graphite:
+  server: 172.28.232.236
+  port: 2012
+  target: aliasByNode(sumSeriesWithWildcards(servers.*.KafkaBrokerTopicMetrics.*.MessagesInPerSec.OneMinuteRate, 1), 2)
+  t_start: -1minutes

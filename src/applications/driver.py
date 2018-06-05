@@ -1,5 +1,5 @@
 import sys
-from common.main_pipeline import KafkaPipeline
+from common.main_pipeline import MainPipeline
 from util.utils import Utils
 from pyspark.sql.functions import from_json, lit, col, struct, udf
 from pyspark.sql.types import StringType, DoubleType, StructType, StructField
@@ -104,7 +104,7 @@ def create_processor(configuration):
 
 if __name__ == "__main__":
     configuration = Utils.load_config(sys.argv[:])
-    KafkaPipeline(
+    MainPipeline(
         configuration,
         create_processor(configuration)
-    ).start()
+    )

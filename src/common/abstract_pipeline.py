@@ -23,7 +23,7 @@ class AbstractPipeline(object):
         self.spark = self.__create_spark_session()
         read_stream = self._create_custom_read_batch(self.spark)
         pipelines = processor.create(read_stream)
-        self._write_streams = self.__create_write_streams(pipelines)
+        self._write_streams = self.__create_write_batch(pipelines)
 
     def __create_spark_session(self):
         options = self._configuration.property("spark")
@@ -44,24 +44,22 @@ class AbstractPipeline(object):
         """
         Abstract fabric method for custom reader
         :param spark: spark session
-        :return: custom read stream
+        :return: custom read batch
         """
 
     @abstractmethod
-    def _create_custom_write_streams(self, spark):
+    def _create_custom_write_batch(self, spark):
         """
         Abstract fabric method for custom writer
         :param spark: spark session
-        :return: custom read stream
+        :return: custom read batch
         """
 
-    def __create_write_streams(self, pipelines):
+    def __create_write_batch(self, pipelines):
         if self._configuration.property("spark.consoleWriter"):
-            return self.__create_console_write_streams(pipelines)
+            return self.__create_console_write_batch(pipelines)
         else:
-            return self._create_custom_write_streams(pipelines)
+            return self._create_custom_write_batch(pipelines)
 
-    def __create_console_write_streams(self, pipelines):
-        return [pipeline.writeStream.format("console").outputMode(self._output_mode)
-                    .option("truncate", False).option("numRows", 100) for pipeline in
-                pipelines]
+    def __create_console_write_batch(self, df):
+        return df.show()
