@@ -1,0 +1,10 @@
+spark:
+  appName: kafka-ingestion-rates
+  master: local[*]
+  checkpointLocation: file:///spark/kafka/ingestion-rates/checkpoints
+  shuffle.partitions: 1
+  consoleWriter: false
+
+graphite:
+  aggregation: sum
+  topicPrefix: odhecx_in_

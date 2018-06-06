@@ -30,16 +30,5 @@ class MainPipeline(AbstractPipeline):
         if option in options:
             reader.option(option, options[option])
 
-    def _create_custom_write_batch(self, pipelines):
-        streams = []
-        index = 0
-        for pipeline in pipelines:
-            write_stream = pipeline.writeStream.format("kafka").outputMode(self._output_mode)
-            options = self._configuration.property("kafka")
-            streams.append(
-                self.__set_kafka_securing_settings(write_stream, options)
-                    .option("checkpointLocation",
-                            self._configuration.property("spark.checkpointLocation") + str(index))
-            )
-            index += 1
-        return streams
+    def _create_custom_write_batch(self, batch):
+        return KafkaConnector.push_stats_to_kafka(self._configuration.property("kafka"), batch)

@@ -22,7 +22,7 @@ class AbstractPipeline(object):
         self._output_mode = configuration.property("spark.outputMode", "append")
         self.spark = self.__create_spark_session()
         read_stream = self._create_custom_read_batch(self.spark)
-        pipelines = processor.create(read_stream)
+        pipelines = processor.create(read_stream, self.spark)
         self._write_streams = self.__create_write_batch(pipelines)
 
     def __create_spark_session(self):
@@ -48,7 +48,7 @@ class AbstractPipeline(object):
         """
 
     @abstractmethod
-    def _create_custom_write_batch(self, spark):
+    def _create_custom_write_batch(self, batch):
         """
         Abstract fabric method for custom writer
         :param spark: spark session

@@ -1,6 +1,8 @@
+from time import time
+import json
+
 from util.pipeline_helper import start_batch_processing_pipeline
-from test.unit.common.test_pipeline_helper import TestPipeline
-from pyspark.sql.functions import lit, col, struct, udf
+from pyspark.sql.functions import lit, col, sum
 
 
 class KafkaIngestionRate(object):
@@ -11,26 +13,39 @@ class KafkaIngestionRate(object):
     def __init__(self, configuration):
 
         self.kafka_output = configuration.property("kafka.topics.output")
+        self.topic_prefix = configuration.property("graphite.topicPrefix")
 
-    def create(self, read_batch):
+    def create(self, read_batch, spark):
         """
         Create final stream to output to kafka
         :param read_stream:
         :return: Kafka stream
         """
-        return self._process_pipeline(read_batch)
+        filtered = read_batch \
+            .filter(col('value').isNotNull()) \
+            .sort("value", ascending=False)
 
-    def _process_pipeline(self, df):
+        return self._process_pipeline(filtered, spark)
+
+    def _process_pipeline(self, df, spark):
         """
         Pipeline method
         :param json_stream: kafka stream reader
         :return: list of streams
         """
-        filtered = df \
-            .filter(col('value').isNotNull()) \
-            .sort("value", ascending=False)
 
-        return filtered
+        df.cache()
+
+        ts = str(int(round(time())))
+        total = json.loads(df.groupBy().agg(sum("value")).toJSON().collect()[0])["sum(value)"]
+        target = self.topic_prefix + "*"
+
+        new_row = spark.createDataFrame([[ts, target, total]], ["@timestamp", "target", "message_count"])
+
+        final = new_row.union(df).limit(21)
+
+        return final
+
 
 def create_processor(configuration):
     """
