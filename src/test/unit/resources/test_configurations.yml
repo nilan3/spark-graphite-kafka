@@ -1,0 +1,8 @@
+spark:
+  appName: kafka-ingestion-rates
+  master: local[*]
+  checkpointLocation: file:///spark/kafka/ingestion-rates/checkpoints
+  shuffle.partitions: 1
+
+graphite:
+  aggregation: sum  #sum or avg

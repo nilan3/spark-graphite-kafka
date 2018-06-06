@@ -4,6 +4,7 @@ import yaml
 class Configuration(object):
 
     def __init__(self, filename=None, dict={}):
+        print(filename)
         if (filename is not None):
             with open(filename, 'r') as stream:
                 try:

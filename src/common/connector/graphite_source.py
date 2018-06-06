@@ -81,8 +81,7 @@ class GraphiteSource(object):
                 LOGGER.info("Successfully connected to Kafka")
                 break
             except Exception:
-                LOGGER.warning("Successfully connected to Kafka")
-                print('failed to connect to kafka, attempt: '+ str(attempt+1))
+                LOGGER.error("failed to connect to kafka, attempt: "+ str(attempt+1))
                 if attempt == retries-1:
                     sys.exit(1)
 
@@ -98,4 +97,16 @@ class GraphiteSource(object):
             .flatMap(
             lambda topic_str: GraphiteSource.query_graphite(graphite_options['server'], graphite_options['tStart'],
                                                             graphite_options['target'], topic_str)) \
+            .map(lambda x: GraphiteSource.format_data(x, graphite_options['aggregation']))
+
+    @staticmethod
+    def test_sample_data(sample_data, graphite_options, spark):
+        """
+        Build url - get response
+        :return: dict list
+        """
+        rdd = spark \
+            .sparkContext.parallelize(sample_data)
+
+        return rdd \
             .map(lambda x: GraphiteSource.format_data(x, graphite_options['aggregation']))

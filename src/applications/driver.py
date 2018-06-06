@@ -1,4 +1,5 @@
 from util.pipeline_helper import start_batch_processing_pipeline
+from test.unit.common.test_pipeline_helper import TestPipeline
 from pyspark.sql.functions import lit, col, struct, udf
 
 
