@@ -8,28 +8,16 @@ from common.connector.kafka_sink import KafkaConnector
 
 class MainPipeline(AbstractPipeline):
     """
-    Base class for structured streaming pipeline, which read data from kafka and write result to kafka as well
+    Base class for batch processing pipeline, which read data from graphite and write result to kafka as well
     """
 
     def _create_custom_read_batch(self, spark):
-        target = self._configuration.property("graphite.target")
-        t_start = self._configuration.property("graphite.t_start")
-        server = self._configuration.property("graphite.server")
-        port = self._configuration.property("graphite.port")
-        resp = GraphiteSource.get_data('{}:{}'.format(server, port), t_start, target)
-        df_arr = []
-        for series in resp:
-            for point in series['datapoints']:
-                record = {
-                    "@timestamp": str(point[1]),
-                    "value": point[0],
-                    "target": series["target"]
-                }
-                df_arr.append(record)
+        resp = GraphiteSource.get_data(self._configuration.property("kafka"), self._configuration.property("graphite"), spark)
+        resp.cache()
 
-        dtaRDD = spark.sparkContext.parallelize(df_arr).map(lambda x: Row(**OrderedDict(sorted(x.items()))))
+        data_rdd = resp.map(lambda x: Row(**OrderedDict(sorted(x.items()))))
 
-        return dtaRDD.toDF()
+        return spark.createDataFrame(data_rdd)
 
     @staticmethod
     def __set_kafka_securing_settings(stream, options):

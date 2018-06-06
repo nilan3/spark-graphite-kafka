@@ -6,15 +6,17 @@ spark:
   consoleWriter: true
 
 kafka:
-  bootstrap.servers: 172.28.232.236:9094,172.28.232.237:9094,172.28.232.238:9094,172.28.232.239:9094,172.28.232.240:9094,172.28.232.241:9094,172.28.232.242:9094,172.28.232.243:9094,172.28.232.244:9094
+  bootstrap.servers: 192.168.100.1:9094,192.168.100.2:9094,192.168.100.3:9094,192.168.100.4:9094,192.168.100.5:9094,192.168.100.6:9094,192.168.100.7:9094,192.168.100.8:9094,192.168.100.9:9094,192.168.100.10:9094,192.168.100.11:9094,192.168.100.12:9094,192.168.100.13:9094,192.168.100.14:9094,192.168.100.15:9094,192.168.100.16:9094,192.168.100.17:9094,192.168.100.18:9094
   topics:
-    outputs:
-      ingestion: odhat_pr_various_pan_prd_kafka_ingestion_rates_v1
+    output: odhat_pr_various_pan_prd_kafka_ingestion_rates_v1
   security.protocol: SASL_PLAINTEXT
   sasl.mechanism: PLAIN
+  sasl.plain.username: spark
+  sasl.plain.password: aeGog2eic1naihaith1F
 
 graphite:
-  server: 172.28.232.236
-  port: 2012
-  target: aliasByNode(sumSeriesWithWildcards(servers.*.KafkaBrokerTopicMetrics.*.MessagesInPerSec.OneMinuteRate, 1), 2)
-  t_start: -1minutes
+  server: 192.168.100.2:2012
+  topicPrefix: odhecx_in_
+  target: aliasByNode(sumSeriesWithWildcards(servers.*.KafkaBrokerTopicMetrics.{topics}.MessagesInPerSec.OneMinuteRate, 1), 2)
+  tStart: -5minutes
+  aggregation: sum  #sum or avg

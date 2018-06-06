@@ -62,4 +62,4 @@ class AbstractPipeline(object):
             return self._create_custom_write_batch(pipelines)
 
     def __create_console_write_batch(self, df):
-        return df.show()
+        return df.show(347, False)
