@@ -13,7 +13,7 @@ class KafkaIngestionRate(object):
     def __init__(self, configuration):
 
         self.kafka_output = configuration.property("kafka.topics.output")
-        self.topic_prefix = configuration.property("graphite.topicPrefix")
+        self.topic_regex = configuration.property("graphite.topicRegex")
 
     def create(self, read_batch, spark):
         """
@@ -38,9 +38,8 @@ class KafkaIngestionRate(object):
 
         ts = str(int(round(time())))
         total = json.loads(df.groupBy().agg(sum("value")).toJSON().collect()[0])["sum(value)"]
-        target = self.topic_prefix + "*"
 
-        new_row = spark.createDataFrame([[ts, target, total]], ["@timestamp", "target", "message_count"])
+        new_row = spark.createDataFrame([[ts, self.topic_regex, total]], ["@timestamp", "target", "message_count"])
 
         final = new_row.union(df).limit(21)
 

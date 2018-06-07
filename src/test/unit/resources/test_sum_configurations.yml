@@ -7,4 +7,4 @@ spark:
 
 graphite:
   aggregation: sum
-  topicPrefix: odhecx_in_
+  topicRegex: odhecx_in_.*

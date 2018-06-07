@@ -12,11 +12,11 @@ kafka:
   security.protocol: SASL_PLAINTEXT
   sasl.mechanism: PLAIN
   sasl.plain.username: spark
-  sasl.plain.password: 
+  sasl.plain.password: aeGog2eic1naihaith1F
 
 graphite:
   server: 192.168.100.2:2012
-  topicPrefix: odhecx_in_
+  topicRegex: odhecx_in_.*   #regex
   target: aliasByNode(sumSeriesWithWildcards(servers.*.KafkaBrokerTopicMetrics.{topics}.MessagesInPerSec.OneMinuteRate, 1), 2)
   tStart: -5minutes
   aggregation: sum  #sum or avg

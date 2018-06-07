@@ -86,7 +86,7 @@ class GraphiteSource(object):
                     sys.exit(1)
 
         topics = list(cons.topics())
-        r = re.compile("{}.*".format(graphite_options['topicPrefix']))
+        r = re.compile(graphite_options['topicRegex'])
         filtered = list(filter(r.match, topics))
         length = 10
         filtered_groups = [','.join(filtered[i:i+length]) for i  in range(0, len(filtered), length)]
