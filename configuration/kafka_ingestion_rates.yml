@@ -12,7 +12,7 @@ kafka:
   security.protocol: SASL_PLAINTEXT
   sasl.mechanism: PLAIN
   sasl.plain.username: spark
-  sasl.plain.password: aeGog2eic1naihaith1F
+  sasl.plain.password: 
 
 graphite:
   server: 192.168.100.2:2012
