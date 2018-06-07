@@ -41,3 +41,10 @@ Check active brokers
 ```
 zookeeper-shell localhost:2181/kafka ls /brokers/ids
 ```
+
+**KafkaCat**
+
+```
+kafkacat -b localhost:9092 -L | grep topic
+kafkacat -C -b localhost:9092 -o -5 -t topic_name
+```
