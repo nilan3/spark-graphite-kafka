@@ -20,3 +20,24 @@ To run unit test:
 ```
 python /odh/python/test/unit/applications/test_kafka_ingestion.py
 ```
+
+**Kafka Cheatsheet**
+
+Console Producer & Consumer
+```
+kafka-console-consumer --zookeeper localhost:2181/kafka --topic  topic_name --from-beginning
+kafka-console-producer --broker-list localhost:9092 --topic topic_name
+kafka-topics --zookeeper localhost:2181/kafka --list
+```
+
+Topic details & Deleting topic
+```
+kafka-topics --describe --zookeeper localhost:2181/kafka --topic topic_name
+kafka-configs --zookeeper localhost:2181/kafka --alter --entity-type topics --entity-name topic_name --add-config retention.ms=1000
+kafka-topics --delete --zookeeper localhost:2181/kafka --topic topic_name
+```
+
+Check active brokers
+```
+zookeeper-shell localhost:2181/kafka ls /brokers/ids
+```
